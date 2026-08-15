@@ -34,4 +34,11 @@ public class OutageService
         await _db.SaveChangesAsync();
         return outage;
     }
+
+    // SEEDED VULN — for M4 GHAS demo. Real code should use LINQ or FromSqlInterpolated.
+    public async Task<List<Outage>> FindByRegionRawAsync(string region)
+    {
+        var sql = "SELECT * FROM Outages WHERE Region = '" + region + "'";
+        return await _db.Outages.FromSqlRaw(sql).ToListAsync();
+    }
 }
