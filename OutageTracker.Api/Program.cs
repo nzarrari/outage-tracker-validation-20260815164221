@@ -5,7 +5,7 @@ using OutageTracker.Core.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<OutageDbContext>(o =>
-    o.UseSqlite("Data Source=outages.db"));
+    o.UseSqlite("Data Source=../outages.db"));
 builder.Services.AddScoped<OutageService>();
 builder.Services.AddApplicationInsightsTelemetry();
 
@@ -17,7 +17,8 @@ using (var scope = app.Services.CreateScope())
     db.Database.EnsureCreated();
 }
 
-app.MapGet("/outages", async (OutageService svc) => await svc.GetAllAsync());
+app.MapGet("/outages", async (int? severity, OutageService svc) =>
+    await svc.GetBySeverityAsync(severity));
 app.MapGet("/outages/{id:guid}", async (Guid id, OutageService svc) =>
     await svc.GetByIdAsync(id) is Outage o ? Results.Ok(o) : Results.NotFound());
 app.MapPost("/outages", async (Outage outage, OutageService svc) =>
