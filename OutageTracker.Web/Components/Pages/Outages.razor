@@ -28,7 +28,7 @@ else
 {
     <table class="table table-striped">
         <thead>
-            <tr><th>Region</th><th>Severity</th><th>Description</th><th>Reported</th><th>Restored</th></tr>
+            <tr><th>Region</th><th>Severity</th><th>Description</th><th>Reported</th><th>ETA</th><th>Restored</th></tr>
         </thead>
         <tbody>
             @foreach (var o in _outages)
@@ -38,6 +38,7 @@ else
                     <td>@o.Severity</td>
                     <td>@o.Description</td>
                     <td>@o.ReportedAt.ToString("g")</td>
+                    <td>@(o.EstimatedRestorationAt?.ToString("g") ?? "—")</td>
                     <td>@(o.RestoredAt?.ToString("g") ?? "—")</td>
                 </tr>
             }
