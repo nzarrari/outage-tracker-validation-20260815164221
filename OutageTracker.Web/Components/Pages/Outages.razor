@@ -1,0 +1,43 @@
+@page "/outages"
+@using OutageTracker.Core
+@using OutageTracker.Core.Models
+@rendermode InteractiveServer
+@inject OutageService Svc
+
+<PageTitle>Outages</PageTitle>
+
+<h1>⚡ Active Outages</h1>
+
+@if (_outages is null)
+{
+    <p><em>Loading…</em></p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr><th>Region</th><th>Severity</th><th>Description</th><th>Reported</th><th>Restored</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var o in _outages)
+            {
+                <tr>
+                    <td>@o.Region</td>
+                    <td>@o.Severity</td>
+                    <td>@o.Description</td>
+                    <td>@o.ReportedAt.ToString("g")</td>
+                    <td>@(o.RestoredAt?.ToString("g") ?? "—")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Outage>? _outages;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _outages = await Svc.GetAllAsync();
+    }
+}
