@@ -27,7 +27,10 @@ app.MapPost("/outages", async (Outage outage, OutageService svc) =>
     return Results.Created($"/outages/{created.Id}", created);
 });
 
-app.MapGet("/outages/by-region", async (string region, OutageService svc) =>
-    await svc.FindByRegionRawAsync(region));
+app.MapGet("/outages/by-region", async (HttpRequest req, OutageService svc) =>
+{
+    var region = req.Query["region"].ToString();
+    return await svc.FindByRegionRawAsync(region);
+});
 
 app.Run();
