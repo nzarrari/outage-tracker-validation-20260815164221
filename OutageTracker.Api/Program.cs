@@ -27,10 +27,12 @@ app.MapPost("/outages", async (Outage outage, OutageService svc) =>
     return Results.Created($"/outages/{created.Id}", created);
 });
 
-app.MapGet("/outages/by-region", async (HttpRequest req, OutageService svc) =>
+app.MapGet("/outages/by-region", async (HttpContext ctx, OutageDbContext db) =>
 {
-    var region = req.Query["region"].ToString();
-    return await svc.FindByRegionRawAsync(region);
+    // SEEDED VULN — for M4 GHAS demo
+    var region = ctx.Request.Query["region"].ToString();
+    var sql = "SELECT * FROM Outages WHERE Region = '" + region + "'";
+    return await db.Outages.FromSqlRaw(sql).ToListAsync();
 });
 
 app.Run();
