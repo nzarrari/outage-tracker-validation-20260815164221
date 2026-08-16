@@ -31,3 +31,6 @@ app.Run();
 
 app.MapGet("/outages/by-region", async (string region, OutageService svc) =>
     await svc.FindByRegionRawAsync(region));
+
+app.MapGet("/outages/by-region", async (string region, OutageService svc) =>
+    await svc.FindByRegionRawAsync(region));

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.Sqlite;
 using OutageTracker.Core.Models;
 
 namespace OutageTracker.Core;
@@ -39,5 +40,20 @@ public class OutageService
     {
         var sql = "SELECT * FROM Outages WHERE Region = '" + region + "'";
         return await _db.Outages.FromSqlRaw(sql).ToListAsync();
+    }
+    // SEEDED VULN — for M4 GHAS demo. Do not ship.
+    public async Task<List<string>> FindByRegionRawAsync(string region)
+    {
+        var results = new List<string>();
+        using var connection = new SqliteConnection("Data Source=../outages.db");
+        await connection.OpenAsync();
+        using var command = connection.CreateCommand();
+        command.CommandText = "SELECT Description FROM Outages WHERE Region = '" + region + "'";
+        using var reader = await command.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
+        {
+            results.Add(reader.GetString(0));
+        }
+        return results;
     }
 }
