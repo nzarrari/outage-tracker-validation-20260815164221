@@ -31,6 +31,12 @@ app.MapGet("/outages/by-region", async (HttpContext ctx, OutageDbContext db) =>
 {
     // SEEDED VULN — for M4 GHAS demo
     var region = ctx.Request.Query["region"].ToString();
+    var conn = db.Database.GetDbConnection();
+    await conn.OpenAsync();
+    using var cmd = conn.CreateCommand();
+    cmd.CommandText = "SELECT COUNT(*) FROM Outages WHERE Region = '" + region + "'";
+    var count = await cmd.ExecuteScalarAsync();
+    conn.Close();
     var sql = "SELECT * FROM Outages WHERE Region = '" + region + "'";
     return await db.Outages.FromSqlRaw(sql).ToListAsync();
 });
