@@ -36,12 +36,6 @@ public class OutageService
         return outage;
     }
     // SEEDED VULN — for M4 GHAS demo. Do not ship.
-    public async Task<List<Outage>> FindByRegionRawAsync(string region)
-    {
-        var sql = "SELECT * FROM Outages WHERE Region = '" + region + "'";
-        return await _db.Outages.FromSqlRaw(sql).ToListAsync();
-    }
-    // SEEDED VULN — for M4 GHAS demo. Do not ship.
     public async Task<List<string>> FindByRegionRawAsync(string region)
     {
         var results = new List<string>();
