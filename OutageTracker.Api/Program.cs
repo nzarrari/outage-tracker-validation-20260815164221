@@ -29,16 +29,21 @@ app.MapPost("/outages", async (Outage outage, OutageService svc) =>
 
 app.MapGet("/outages/by-region", async (HttpContext ctx, OutageDbContext db) =>
 {
-    // SEEDED VULN — for M4 GHAS demo
     var region = ctx.Request.Query["region"].ToString();
+    // fix: use parameterized query to prevent SQL injection
     var conn = db.Database.GetDbConnection();
     await conn.OpenAsync();
     using var cmd = conn.CreateCommand();
-    cmd.CommandText = "SELECT COUNT(*) FROM Outages WHERE Region = '" + region + "'";
+    cmd.CommandText = "SELECT COUNT(*) FROM Outages WHERE Region = @region";
+    var p = cmd.CreateParameter();
+    p.ParameterName = "@region";
+    p.Value = region;
+    cmd.Parameters.Add(p);
     var count = await cmd.ExecuteScalarAsync();
     conn.Close();
-    var sql = "SELECT * FROM Outages WHERE Region = '" + region + "'";
-    return await db.Outages.FromSqlRaw(sql).ToListAsync();
+    return await db.Outages
+        .FromSqlInterpolated($"SELECT * FROM Outages WHERE Region = {region}")
+        .ToListAsync();
 });
 
 app.Run();
