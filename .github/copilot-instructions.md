@@ -24,4 +24,9 @@ severity 1 is the worst; RestoredAt=null means still out.
 ## Review guidelines (for Copilot code review)
 - Reject PRs with public methods lacking XML docs.
 - Reject `Console.WriteLine`; use `ILogger<T>` instead.
-- Reject `.Result` / `.Wait()` on tasks in async paths.
+- Reject `.Result` / `.Wait()` on tasks in async paths — deadlock risk.
+- Reject `catch (Exception ex)` with no logging or rethrow.
+- Reject any new endpoint without a corresponding xUnit test.
+- Reject any DbContext or HttpClient created with `new` outside a factory or DI.
+- Prefer `IReadOnlyList<T>` over `List<T>` on return types when the caller shouldn't mutate.
+- Any new NuGet package must have a comment in the PR body explaining why it was added.

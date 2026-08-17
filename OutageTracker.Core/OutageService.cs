@@ -35,17 +35,23 @@ public class OutageService
         await _db.SaveChangesAsync();
         return outage;
     }
-    // FIXED — parameterized query prevents SQL injection.
+    // FIXED — parameterized query prevents SQL injection; uses injected DbContext connection.
     public async Task<List<string>> FindByRegionRawAsync(string region)
     {
         var results = new List<string>();
-        using var connection = new SqliteConnection("Data Source=../outages.db");
-        await connection.OpenAsync();
+        var connection = _db.Database.GetDbConnection();
+        if (connection.State != System.Data.ConnectionState.Open)
+        {
+            await connection.OpenAsync().ConfigureAwait(false);
+        }
         using var command = connection.CreateCommand();
         command.CommandText = "SELECT Description FROM Outages WHERE Region = $region";
-        command.Parameters.AddWithValue("$region", region);
-        using var reader = await command.ExecuteReaderAsync();
-        while (await reader.ReadAsync())
+        var parameter = command.CreateParameter();
+        parameter.ParameterName = "$region";
+        parameter.Value = region;
+        command.Parameters.Add(parameter);
+        using var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
+        while (await reader.ReadAsync().ConfigureAwait(false))
         {
             results.Add(reader.GetString(0));
         }

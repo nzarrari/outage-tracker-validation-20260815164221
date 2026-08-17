@@ -26,11 +26,7 @@ app.MapPost("/outages", async (Outage outage, OutageService svc) =>
     var created = await svc.CreateAsync(outage);
     return Results.Created($"/outages/{created.Id}", created);
 });
+app.MapGet("/outages/by-region", async (string region, OutageService svc) =>
+    await svc.FindByRegionRawAsync(region));
 
 app.Run();
-
-app.MapGet("/outages/by-region", async (string region, OutageService svc) =>
-    await svc.FindByRegionRawAsync(region));
-
-app.MapGet("/outages/by-region", async (string region, OutageService svc) =>
-    await svc.FindByRegionRawAsync(region));
